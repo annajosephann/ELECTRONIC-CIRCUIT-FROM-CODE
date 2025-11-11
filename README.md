@@ -474,12 +474,3 @@ Contributions are welcome! Areas to help:
 - **Documentation**: Help improve the guides and examples
 - **Code Contributions**: Fork and submit pull requests
 
-## 📄 License
-
-This project is open source and available under the MIT License.
-
----
-
-**Happy Circuit Designing!** ⚡
-
-Built with ❤️ for the electronics community
