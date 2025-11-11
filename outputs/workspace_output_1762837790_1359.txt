@@ -1,0 +1,7 @@
+Serving HTTP on 0.0.0.0 port 8050 (http://0.0.0.0:8050/) ...
+127.0.0.1 - - [11/Nov/2025 05:10:27] "GET /?_gl=1*1mggeaj*_gcl_au*MTcxNjUwMDU0OC4xNzU4NDIzNzQx*_ga*MTgwOTA1NTkzNi4xNzU4NDIzNzQx*_ga_8NW18Q4WF2*czE3NjI4Mzc1NzIkbzE0JGcxJHQxNzYyODM3NzUzJGo4JGwwJGg4MzgwOTE5MzI.&password=7043ca74-c01e-4711-bf0c-e24f5000fb0a HTTP/1.1" 200 -
+127.0.0.1 - - [11/Nov/2025 05:10:29] "GET /circuit-engine.js?password=7043ca74-c01e-4711-bf0c-e24f5000fb0a HTTP/1.1" 200 -
+127.0.0.1 - - [11/Nov/2025 05:10:29] "GET /main.js?password=7043ca74-c01e-4711-bf0c-e24f5000fb0a HTTP/1.1" 200 -
+127.0.0.1 - - [11/Nov/2025 05:10:29] "GET /styles.css?password=7043ca74-c01e-4711-bf0c-e24f5000fb0a HTTP/1.1" 200 -
+127.0.0.1 - - [11/Nov/2025 05:10:31] code 404, message File not found
+127.0.0.1 - - [11/Nov/2025 05:10:31] "GET /favicon.ico?password=7043ca74-c01e-4711-bf0c-e24f5000fb0a HTTP/1.1" 404 -

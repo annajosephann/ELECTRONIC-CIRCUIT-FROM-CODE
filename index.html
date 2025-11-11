@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Circuit Designer - Code to Circuit</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">
+                <span class="logo-icon">⚡</span>
+                AI Circuit Designer
+            </h1>
+            <p class="tagline">Transform Code into Circuit Diagrams Instantly</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="workspace">
+                <!-- Code Editor Section -->
+                <section class="editor-section">
+                    <div class="section-header">
+                        <h2>📝 Circuit Code Editor</h2>
+                        <div class="editor-controls">
+                            <button class="btn btn-primary" onclick="generateCircuit()">
+                                <span class="icon">🔄</span> Generate Circuit
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearEditor()">
+                                <span class="icon">🗑️</span> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="editor-container">
+                        <textarea id="circuit-code" placeholder="Write your circuit code here..."></textarea>
+                    </div>
+                    <div class="examples-section">
+                        <h3>📚 Quick Examples:</h3>
+                        <div class="example-buttons">
+                            <button class="example-btn" onclick="loadExample('led')">LED Circuit</button>
+                            <button class="example-btn" onclick="loadExample('resistor')">Resistor Network</button>
+                            <button class="example-btn" onclick="loadExample('amplifier')">Amplifier</button>
+                            <button class="example-btn" onclick="loadExample('filter')">RC Filter</button>
+                            <button class="example-btn" onclick="loadExample('arduino_blink')">Arduino Blink</button>
+                            <button class="example-btn" onclick="loadExample('arduino_sensor')">Arduino Sensor</button>
+                            <button class="example-btn" onclick="loadExample('arduino_motor')">Arduino Motor</button>
+                            <button class="example-btn" onclick="loadExample('esp32_cam_project')">ESP32-CAM Security</button>
+                            <button class="example-btn" onclick="loadExample('robot_obstacle')">Robot Obstacle Avoid</button>
+                            <button class="example-btn" onclick="loadExample('smart_home')">Smart Home System</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Circuit Preview Section -->
+                <section class="preview-section">
+                    <div class="section-header">
+                        <h2>🔌 Circuit Preview</h2>
+                        <div class="preview-controls">
+                            <button class="btn btn-success" onclick="exportSVG()">
+                                <span class="icon">💾</span> Export SVG
+                            </button>
+                            <button class="btn btn-info" onclick="exportPNG()">
+                                <span class="icon">🖼️</span> Export PNG
+                            </button>
+                            <button class="btn btn-warning" onclick="zoomIn()">
+                                <span class="icon">🔍</span> Zoom In
+                            </button>
+                            <button class="btn btn-warning" onclick="zoomOut()">
+                                <span class="icon">🔍</span> Zoom Out
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-container">
+                        <div id="circuit-canvas">
+                            <svg id="circuit-svg" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Circuit will be rendered here -->
+                                <text x="400" y="300" text-anchor="middle" class="placeholder-text">
+                                    Your circuit diagram will appear here
+                                </text>
+                            </svg>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Simulation Section -->
+                <section class="simulation-section">
+                    <div class="section-header">
+                        <h2>🎮 Circuit Simulation</h2>
+                        <div class="simulation-controls">
+                            <button class="btn btn-success" onclick="startSimulation()">
+                                <span class="icon">▶️</span> Start
+                            </button>
+                            <button class="btn btn-warning" onclick="pauseSimulation()">
+                                <span class="icon">⏸️</span> Pause
+                            </button>
+                            <button class="btn btn-danger" onclick="resetSimulation()">
+                                <span class="icon">🔄</span> Reset
+                            </button>
+                        </div>
+                    </div>
+                    <div class="simulation-container">
+                        <div class="simulation-split">
+                            <!-- Virtual Environment -->
+                            <div class="virtual-environment">
+                                <h3>🌍 Virtual Environment</h3>
+                                <canvas id="simulation-canvas" width="400" height="300"></canvas>
+                                <div class="environment-controls">
+                                    <button class="btn btn-sm" onclick="addVirtualObject('wall')">🧱 Add Wall</button>
+                                    <button class="btn btn-sm" onclick="addVirtualObject('obstacle')">🚧 Add Obstacle</button>
+                                    <button class="btn btn-sm" onclick="addVirtualObject('target')">🎯 Add Target</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Simulation Output -->
+                            <div class="simulation-output">
+                                <h3>📊 Simulation Output</h3>
+                                <div class="output-tabs">
+                                    <button class="tab-btn active" onclick="switchOutputTab('sensors')">Sensors</button>
+                                    <button class="tab-btn" onclick="switchOutputTab('serial')">Serial Monitor</button>
+                                    <button class="tab-btn" onclick="switchOutputTab('graph')">Graphs</button>
+                                </div>
+                                <div class="output-content">
+                                    <div id="sensors-output" class="output-panel active">
+                                        <div class="sensor-readings">
+                                            <div class="sensor-item">
+                                                <span class="sensor-label">Ultrasonic:</span>
+                                                <span class="sensor-value" id="ultrasonic-value">-- cm</span>
+                                            </div>
+                                            <div class="sensor-item">
+                                                <span class="sensor-label">Temperature:</span>
+                                                <span class="sensor-value" id="temperature-value">-- °C</span>
+                                            </div>
+                                            <div class="sensor-item">
+                                                <span class="sensor-label">Humidity:</span>
+                                                <span class="sensor-value" id="humidity-value">-- %</span>
+                                            </div>
+                                            <div class="sensor-item">
+                                                <span class="sensor-label">Light Level:</span>
+                                                <span class="sensor-value" id="light-value">-- lux</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="serial-output" class="output-panel">
+                                        <div class="serial-monitor">
+                                            <pre id="serial-content"></pre>
+                                        </div>
+                                    </div>
+                                    <div id="graph-output" class="output-panel">
+                                        <canvas id="data-graph" width="350" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Component Library -->
+            <section class="components-section">
+                <div class="section-header">
+                    <h2>🧩 Component Library</h2>
+                </div>
+                
+                <!-- Basic Components -->
+                <h3 class="component-category">⚡ Basic Components</h3>
+                <div class="components-grid">
+                    <div class="component-card" onclick="insertComponent('resistor')">
+                        <div class="component-icon">⟡</div>
+                        <div class="component-name">Resistor</div>
+                        <div class="component-code">R1: resistor 1k</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('capacitor')">
+                        <div class="component-icon">⊓</div>
+                        <div class="component-name">Capacitor</div>
+                        <div class="component-code">C1: capacitor 100uF</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('inductor')">
+                        <div class="component-icon">〰️</div>
+                        <div class="component-name">Inductor</div>
+                        <div class="component-code">L1: inductor 10mH</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('led')">
+                        <div class="component-icon">💡</div>
+                        <div class="component-name">LED</div>
+                        <div class="component-code">LED1: led red</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('battery')">
+                        <div class="component-icon">🔋</div>
+                        <div class="component-name">Battery</div>
+                        <div class="component-code">V1: battery 9V</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('ground')">
+                        <div class="component-icon">⏚</div>
+                        <div class="component-name">Ground</div>
+                        <div class="component-code">GND: ground</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('switch')">
+                        <div class="component-icon">🔘</div>
+                        <div class="component-name">Switch</div>
+                        <div class="component-code">SW1: switch</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('transistor')">
+                        <div class="component-icon">▷</div>
+                        <div class="component-name">Transistor</div>
+                        <div class="component-code">Q1: npn</div>
+                    </div>
+                </div>
+
+                <!-- Arduino Boards -->
+                <h3 class="component-category">🔧 Arduino Boards</h3>
+                <div class="components-grid">
+                    <div class="component-card" onclick="insertComponent('arduino_uno')">
+                        <div class="component-icon">🔲</div>
+                        <div class="component-name">Arduino Uno</div>
+                        <div class="component-code">ARDUINO1: arduino_uno</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('arduino_nano')">
+                        <div class="component-icon">🟩</div>
+                        <div class="component-name">Arduino Nano</div>
+                        <div class="component-code">NANO1: arduino_nano</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('arduino_mega')">
+                        <div class="component-icon">🟦</div>
+                        <div class="component-name">Arduino Mega</div>
+                        <div class="component-code">MEGA1: arduino_mega</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('esp32')">
+                        <div class="component-icon">📶</div>
+                        <div class="component-name">ESP32 Dev Board</div>
+                        <div class="component-code">ESP32_1: esp32</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('esp32_cam')">
+                        <div class="component-icon">📷</div>
+                        <div class="component-name">ESP32-CAM</div>
+                        <div class="component-code">CAM1: esp32_cam</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('esp8266')">
+                        <div class="component-icon">📡</div>
+                        <div class="component-name">ESP8266 NodeMCU</div>
+                        <div class="component-code">ESP1: esp8266</div>
+                    </div>
+                </div>
+
+                <!-- Sensors -->
+                <h3 class="component-category">📡 Sensors</h3>
+                <div class="components-grid">
+                    <div class="component-card" onclick="insertComponent('ultrasonic')">
+                        <div class="component-icon">📡</div>
+                        <div class="component-name">Ultrasonic</div>
+                        <div class="component-code">HC1: ultrasonic HC-SR04</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('dht11')">
+                        <div class="component-icon">🌡️</div>
+                        <div class="component-name">DHT11 Sensor</div>
+                        <div class="component-code">DHT1: dht11</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('dht22')">
+                        <div class="component-icon">🌡️</div>
+                        <div class="component-name">DHT22 Sensor</div>
+                        <div class="component-code">DHT2: dht22</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('ldr')">
+                        <div class="component-icon">☀️</div>
+                        <div class="component-name">LDR</div>
+                        <div class="component-code">LDR1: ldr</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('pir')">
+                        <div class="component-icon">👤</div>
+                        <div class="component-name">PIR Motion</div>
+                        <div class="component-code">PIR1: pir</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('ir_sensor')">
+                        <div class="component-icon">🔴</div>
+                        <div class="component-name">IR Sensor</div>
+                        <div class="component-code">IR1: ir_sensor</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('accelerometer')">
+                        <div class="component-icon">📐</div>
+                        <div class="component-name">Accelerometer</div>
+                        <div class="component-code">ACC1: accelerometer MPU6050</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('gyro')">
+                        <div class="component-icon">🔄</div>
+                        <div class="component-name">Gyroscope</div>
+                        <div class="component-code">GYRO1: gyro MPU6050</div>
+                    </div>
+                </div>
+
+                <!-- Actuators -->
+                <h3 class="component-category">⚙️ Actuators</h3>
+                <div class="components-grid">
+                    <div class="component-card" onclick="insertComponent('servo')">
+                        <div class="component-icon">⚙️</div>
+                        <div class="component-name">Servo Motor</div>
+                        <div class="component-code">SERVO1: servo SG90</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('dc_motor')">
+                        <div class="component-icon">🔄</div>
+                        <div class="component-name">DC Motor</div>
+                        <div class="component-code">M1: dc_motor</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('stepper')">
+                        <div class="component-icon">🔧</div>
+                        <div class="component-name">Stepper Motor</div>
+                        <div class="component-code">STEP1: stepper 28BYJ48</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('relay')">
+                        <div class="component-icon">🔌</div>
+                        <div class="component-name">Relay</div>
+                        <div class="component-code">RELAY1: relay 5V</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('buzzer')">
+                        <div class="component-icon">🔊</div>
+                        <div class="component-name">Buzzer</div>
+                        <div class="component-code">BUZZ1: buzzer</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('rgb_led')">
+                        <div class="component-icon">🌈</div>
+                        <div class="component-name">RGB LED</div>
+                        <div class="component-code">RGB1: rgb_led</div>
+                    </div>
+                </div>
+
+                <!-- Display & Input -->
+                <h3 class="component-category">📺 Display & Input</h3>
+                <div class="components-grid">
+                    <div class="component-card" onclick="insertComponent('lcd')">
+                        <div class="component-icon">📺</div>
+                        <div class="component-name">LCD 16x2</div>
+                        <div class="component-code">LCD1: lcd 16x2</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('oled')">
+                        <div class="component-icon">📱</div>
+                        <div class="component-name">OLED Display</div>
+                        <div class="component-code">OLED1: oled 128x64</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('7segment')">
+                        <div class="component-icon">🔢</div>
+                        <div class="component-name">7-Segment</div>
+                        <div class="component-code">SEG1: 7segment</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('potentiometer')">
+                        <div class="component-icon">🎚️</div>
+                        <div class="component-name">Potentiometer</div>
+                        <div class="component-code">POT1: potentiometer 10k</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('pushbutton')">
+                        <div class="component-icon">🔴</div>
+                        <div class="component-name">Push Button</div>
+                        <div class="component-code">BTN1: pushbutton</div>
+                    </div>
+                </div>
+
+                <!-- Virtual Objects for Simulation -->
+                <h3 class="component-category">🌍 Virtual Objects</h3>
+                <div class="components-grid">
+                    <div class="component-card" onclick="insertComponent('virtual_wall')">
+                        <div class="component-icon">🧱</div>
+                        <div class="component-name">Virtual Wall</div>
+                        <div class="component-code">WALL1: virtual_wall</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('virtual_obstacle')">
+                        <div class="component-icon">🚧</div>
+                        <div class="component-name">Virtual Obstacle</div>
+                        <div class="component-code">OBJ1: virtual_obstacle</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('virtual_target')">
+                        <div class="component-icon">🎯</div>
+                        <div class="component-name">Virtual Target</div>
+                        <div class="component-code">TARGET1: virtual_target</div>
+                    </div>
+                    <div class="component-card" onclick="insertComponent('virtual_light')">
+                        <div class="component-icon">💡</div>
+                        <div class="component-name">Virtual Light</div>
+                        <div class="component-code">LIGHT1: virtual_light</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Documentation -->
+            <section class="docs-section">
+                <div class="section-header">
+                    <h2>📖 How to Use</h2>
+                </div>
+                <div class="docs-content">
+                    <div class="doc-step">
+                        <h3>1. Write Circuit Code</h3>
+                        <p>Use simple, intuitive syntax to describe your circuit components and connections.</p>
+                    </div>
+                    <div class="doc-step">
+                        <h3>2. Click Generate</h3>
+                        <p>The AI will parse your code and create a professional circuit diagram.</p>
+                    </div>
+                    <div class="doc-step">
+                        <h3>3. Export Your Design</h3>
+                        <p>Download your circuit as SVG or PNG for documentation or sharing.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 AI Circuit Designer. Built with ❤️ for engineers and hobbyists.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="circuit-engine.js"></script>
+    <script src="simulation-engine.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
